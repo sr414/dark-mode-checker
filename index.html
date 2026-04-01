@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dark Mode Color Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .controls {
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 8px;
+      margin-right: 10px;
+      width: 150px;
+    }
+
+    .preview-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .preview {
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 10px 15px;
+      margin-top: 10px;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+
+    .result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dark Mode Color Checker</h1>
+
+  <div class="controls">
+    <label>Background Color:</label>
+    <input type="text" id="bg" value="#ffffff" />
+
+    <label>Text Color:</label>
+    <input type="text" id="text" value="#000000" />
+
+    <button onclick="updatePreview()">Check</button>
+  </div>
+
+  <div class="preview-container">
+    <div>
+      <h3>Light Mode</h3>
+      <div id="lightPreview" class="preview">
+        <div class="card" id="lightCard">
+          <h2>Sample Headline</h2>
+          <p>This is body text preview.</p>
+          <a href="#" class="button">Shop Now</a>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>Dark Mode (Simulated)</h3>
+      <div id="darkPreview" class="preview">
+        <div class="card" id="darkCard">
+          <h2>Sample Headline</h2>
+          <p>This is body text preview.</p>
+          <a href="#" class="button">Shop Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="result" id="contrastResult"></div>
+
+  <script>
+    function hexToRgb(hex) {
+      hex = hex.replace('#', '');
+      if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+      }
+      const bigint = parseInt(hex, 16);
+      return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255
+      };
+    }
+
+    function luminance(r, g, b) {
+      const a = [r, g, b].map(v => {
+        v /= 255;
+        return v <= 0.03928
+          ? v / 12.92
+          : Math.pow((v + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+    }
+
+    function contrast(hex1, hex2) {
+      const c1 = hexToRgb(hex1);
+      const c2 = hexToRgb(hex2);
+      const l1 = luminance(c1.r, c1.g, c1.b);
+      const l2 = luminance(c2.r, c2.g, c2.b);
+      const brightest = Math.max(l1, l2);
+      const darkest = Math.min(l1, l2);
+      return (brightest + 0.05) / (darkest + 0.05);
+    }
+
+    function invertColor(hex) {
+      const rgb = hexToRgb(hex);
+      const r = 255 - rgb.r;
+      const g = 255 - rgb.g;
+      const b = 255 - rgb.b;
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    function updatePreview() {
+      const bg = document.getElementById('bg').value;
+      const text = document.getElementById('text').value;
+
+      // Light mode
+      const lightCard = document.getElementById('lightCard');
+      lightCard.style.background = bg;
+      lightCard.style.color = text;
+      lightCard.querySelector('.button').style.background = text;
+      lightCard.querySelector('.button').style.color = bg;
+
+      // Dark mode simulation (invert)
+      const darkCard = document.getElementById('darkCard');
+      const darkBg = invertColor(bg);
+      const darkText = invertColor(text);
+
+      darkCard.style.background = darkBg;
+      darkCard.style.color = darkText;
+      darkCard.querySelector('.button').style.background = darkText;
+      darkCard.querySelector('.button').style.color = darkBg;
+
+      // Contrast
+      const ratio = contrast(bg, text).toFixed(2);
+      let resultText = `Contrast Ratio: ${ratio} `;
+
+      if (ratio >= 7) {
+        resultText += '(AAA ✅)';
+      } else if (ratio >= 4.5) {
+        resultText += '(AA ✅)';
+      } else {
+        resultText += '(Fail ❌)';
+      }
+
+      document.getElementById('contrastResult').innerText = resultText;
+    }
+
+    updatePreview();
+  </script>
+</body>
+</html>
