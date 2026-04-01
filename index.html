@@ -188,10 +188,39 @@
       const inv={r:255-rgb.r,g:255-rgb.g,b:255-rgb.b};
       return cr(inv,dBg)>=4.5?inv:{r:235,g:235,b:235};
     }
+    function rgbToHsl(r,g,b){
+      r/=255;g/=255;b/=255;
+      const max=Math.max(r,g,b),min=Math.min(r,g,b);
+      let h,s,l=(max+min)/2;
+      if(max===min){h=s=0;}
+      else{
+        const d=max-min;
+        s=l>0.5?d/(2-max-min):d/(max+min);
+        switch(max){
+          case r:h=((g-b)/d+(g<b?6:0))/6;break;
+          case g:h=((b-r)/d+2)/6;break;
+          case b:h=((r-g)/d+4)/6;break;
+        }
+      }
+      return{h,s,l};
+    }
+    function hslToRgb(h,s,l){
+      let r,g,b;
+      if(s===0){r=g=b=l;}
+      else{
+        const hue2rgb=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;};
+        const q=l<0.5?l*(1+s):l+s-l*s,p=2*l-q;
+        r=hue2rgb(p,q,h+1/3);g=hue2rgb(p,q,h);b=hue2rgb(p,q,h-1/3);
+      }
+      return{r:Math.round(r*255),g:Math.round(g*255),b:Math.round(b*255)};
+    }
     function forceDark(rgb){
-      const l=lum(rgb.r,rgb.g,rgb.b);
-      const inv={r:255-rgb.r,g:255-rgb.g,b:255-rgb.b};
-      return l>0.5?blend(inv,{r:20,g:20,b:20},0.15):blend(inv,{r:230,g:230,b:230},0.1);
+      // Gmail: invert brightness, preserve hue and saturation
+      const hsl=rgbToHsl(rgb.r,rgb.g,rgb.b);
+      const invertedL=1-hsl.l;
+      // Clamp lightness so very light colors go genuinely dark and vice versa
+      const clampedL=hsl.l>0.5?Math.min(0.25,invertedL):Math.max(0.75,invertedL);
+      return hslToRgb(hsl.h,hsl.s,clampedL);
     }
     function badgeClass(r){r=parseFloat(r);return r>=7?'badge pass-aaa':r>=4.5?'badge pass-aa':'badge fail';}
     function badgeLabel(r){r=parseFloat(r);return r>=7?'AAA':r>=4.5?'AA':'Fail';}
