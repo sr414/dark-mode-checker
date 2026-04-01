@@ -8,36 +8,22 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #ffffff;
-      --surface: #f5f4f2;
-      --border: rgba(0,0,0,0.12);
-      --border-mid: rgba(0,0,0,0.2);
-      --text: #1a1a1a;
-      --text-muted: #6b6b6b;
-      --radius-md: 8px;
-      --radius-lg: 12px;
+      --bg: #ffffff; --surface: #f5f4f2; --border: rgba(0,0,0,0.12); --border-mid: rgba(0,0,0,0.2);
+      --text: #1a1a1a; --text-muted: #6b6b6b; --radius-md: 8px; --radius-lg: 12px;
       --pass-aaa-bg: #eaf3de; --pass-aaa-text: #27500a;
       --pass-aa-bg: #e6f1fb; --pass-aa-text: #0c447c;
       --fail-bg: #fcebeb; --fail-text: #a32d2d;
-      --warn-dot: #ba7517;
-      --ok-dot: #3b6d11;
-      --info-dot: #185fa5;
+      --warn-dot: #ba7517; --ok-dot: #3b6d11; --info-dot: #185fa5;
       --mono: 'Courier New', monospace;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #1c1c1e;
-        --surface: #2c2c2e;
-        --border: rgba(255,255,255,0.1);
-        --border-mid: rgba(255,255,255,0.2);
-        --text: #f0f0f0;
-        --text-muted: #a0a0a0;
+        --bg: #1c1c1e; --surface: #2c2c2e; --border: rgba(255,255,255,0.1); --border-mid: rgba(255,255,255,0.2);
+        --text: #f0f0f0; --text-muted: #a0a0a0;
         --pass-aaa-bg: #173404; --pass-aaa-text: #c0dd97;
         --pass-aa-bg: #042c53; --pass-aa-text: #85b7eb;
         --fail-bg: #501313; --fail-text: #f09595;
-        --warn-dot: #ef9f27;
-        --ok-dot: #97c459;
-        --info-dot: #378add;
+        --warn-dot: #ef9f27; --ok-dot: #97c459; --info-dot: #378add;
       }
     }
     body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); padding: 28px 24px; min-height: 100vh; }
@@ -52,17 +38,19 @@
     input[type="text"]:focus { border-color: var(--border-mid); }
     button { height: 36px; padding: 0 14px; border-radius: var(--radius-md); border: 0.5px solid var(--border-mid); background: transparent; color: var(--text); font-size: 13px; cursor: pointer; }
     button:hover { background: var(--surface); }
-    .previews { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .previews { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 8px; }
     .panel { border-radius: var(--radius-lg); border: 0.5px solid var(--border); overflow: hidden; }
     .panel-label { font-size: 11px; padding: 8px 14px; background: var(--surface); color: var(--text-muted); border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .badge { font-size: 11px; padding: 2px 8px; border-radius: var(--radius-md); font-weight: 600; }
     .pass-aaa { background: var(--pass-aaa-bg); color: var(--pass-aaa-text); }
-    .pass-aa  { background: var(--pass-aa-bg);  color: var(--pass-aa-text);  }
-    .fail     { background: var(--fail-bg);      color: var(--fail-text);     }
+    .pass-aa  { background: var(--pass-aa-bg);  color: var(--pass-aa-text); }
+    .fail     { background: var(--fail-bg);      color: var(--fail-text); }
     .email-card { padding: 20px 18px; }
     .email-card .headline { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
     .email-card .body-text { font-size: 13px; line-height: 1.6; margin-bottom: 14px; }
     .email-card .cta { display: inline-block; padding: 9px 20px; border-radius: 999px; font-size: 13px; font-weight: 600; text-decoration: none; cursor: default; }
+    .client-tags { display: flex; flex-wrap: wrap; gap: 5px; padding: 10px 14px 12px; border-top: 0.5px solid var(--border); }
+    .client-tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--surface); color: var(--text-muted); border: 0.5px solid var(--border); }
     .ratio-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
     .ratio-card { flex: 1; min-width: 140px; background: var(--surface); border-radius: var(--radius-md); padding: 12px 14px; }
     .rc-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
@@ -74,17 +62,16 @@
     .rec-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-bottom: 0.5px solid var(--border); }
     .rec-item:last-child { border-bottom: none; }
     .rec-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
-    .dot-warn { background: var(--warn-dot); }
-    .dot-ok   { background: var(--ok-dot); }
-    .dot-info { background: var(--info-dot); }
+    .dot-warn { background: var(--warn-dot); } .dot-ok { background: var(--ok-dot); } .dot-info { background: var(--info-dot); }
     .rec-text { font-size: 13px; line-height: 1.6; }
     .rec-text code { font-family: var(--mono); font-size: 12px; background: var(--surface); padding: 1px 5px; border-radius: 4px; }
     .no-recs { padding: 14px; font-size: 13px; color: var(--text-muted); }
+    .disclaimer { font-size: 11px; color: var(--text-muted); margin-top: 6px; margin-bottom: 20px; font-style: italic; }
   </style>
 </head>
 <body>
   <h1>Dark Mode Color Checker</h1>
-  <p class="subtitle">Preview your email palette across light, smart dark, and force-dark rendering environments.</p>
+  <p class="subtitle">Preview your email palette across light, partial invert, and full invert rendering environments.</p>
 
   <div class="controls">
     <div class="field">
@@ -112,24 +99,46 @@
         <div class="body-text" id="lightB">Refresh your wardrobe with our biggest sale of the season.</div>
         <a class="cta" id="lightCTA">Shop now</a>
       </div>
+      <div class="client-tags">
+        <span class="client-tag">Gmail web</span>
+        <span class="client-tag">Apple Mail macOS</span>
+        <span class="client-tag">iOS Mail (iOS 16+)</span>
+      </div>
     </div>
+
     <div class="panel">
-      <div class="panel-label"><span>Dark mode (smart invert)</span><span id="darkBadge" class="badge">—</span></div>
+      <div class="panel-label"><span>Partial invert</span><span id="darkBadge" class="badge">—</span></div>
       <div class="email-card" id="darkCard">
         <div class="headline" id="darkH">Summer Sale — Up to 50% off</div>
         <div class="body-text" id="darkB">Refresh your wardrobe with our biggest sale of the season.</div>
         <a class="cta" id="darkCTA">Shop now</a>
       </div>
+      <div class="client-tags">
+        <span class="client-tag">Gmail Android</span>
+        <span class="client-tag">Outlook.com</span>
+        <span class="client-tag">Outlook app iOS</span>
+        <span class="client-tag">Outlook app Android</span>
+        <span class="client-tag">Outlook 2019 macOS</span>
+      </div>
     </div>
+
     <div class="panel">
-      <div class="panel-label"><span>Force-dark (Gmail / Apple Mail)</span><span id="forceBadge" class="badge">—</span></div>
+      <div class="panel-label"><span>Full invert</span><span id="forceBadge" class="badge">—</span></div>
       <div class="email-card" id="forceCard">
         <div class="headline" id="forceH">Summer Sale — Up to 50% off</div>
         <div class="body-text" id="forceB">Refresh your wardrobe with our biggest sale of the season.</div>
         <a class="cta" id="forceCTA">Shop now</a>
       </div>
+      <div class="client-tags">
+        <span class="client-tag">Gmail iOS</span>
+        <span class="client-tag">Outlook 2021 Windows</span>
+        <span class="client-tag">Office 365 Windows</span>
+        <span class="client-tag">Windows Mail</span>
+      </div>
     </div>
   </div>
+
+  <p class="disclaimer">Simulations are approximations — always verify in Email on Acid before sending. Client behavior may vary by version and OS.</p>
 
   <div class="ratio-row">
     <div class="ratio-card">
@@ -138,12 +147,12 @@
       <div class="rc-levels" id="lightLevels"></div>
     </div>
     <div class="ratio-card">
-      <div class="rc-label">Dark mode contrast</div>
+      <div class="rc-label">Partial invert contrast</div>
       <div class="rc-val" id="darkRatio">—</div>
       <div class="rc-levels" id="darkLevels"></div>
     </div>
     <div class="ratio-card">
-      <div class="rc-label">Force-dark contrast</div>
+      <div class="rc-label">Full invert contrast</div>
       <div class="rc-val" id="forceRatio">—</div>
       <div class="rc-levels" id="forceLevels"></div>
     </div>
@@ -157,9 +166,9 @@
   <script>
     function hexToRgb(hex) {
       hex = hex.replace('#','').trim();
-      if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
-      if (hex.length !== 6) return null;
-      const n = parseInt(hex,16);
+      if (hex.length===3) hex=hex.split('').map(c=>c+c).join('');
+      if (hex.length!==6) return null;
+      const n=parseInt(hex,16);
       return {r:(n>>16)&255,g:(n>>8)&255,b:n&255};
     }
     function lum(r,g,b) {
@@ -176,18 +185,7 @@
       return '#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
     }
     function blend(c,t,x){return{r:c.r+(t.r-c.r)*x,g:c.g+(t.g-c.g)*x,b:c.b+(t.b-c.b)*x};}
-    function smartDarkBg(rgb){
-      const l=lum(rgb.r,rgb.g,rgb.b);
-      if(l>0.7)return{r:18,g:18,b:18};
-      if(l<0.1)return{r:240,g:240,b:240};
-      return blend({r:255-rgb.r,g:255-rgb.g,b:255-rgb.b},{r:18,g:18,b:18},0.3);
-    }
-    function smartDarkFg(rgb,dBg){
-      const l=lum(rgb.r,rgb.g,rgb.b);
-      if(l<0.3)return{r:235,g:235,b:235};
-      const inv={r:255-rgb.r,g:255-rgb.g,b:255-rgb.b};
-      return cr(inv,dBg)>=4.5?inv:{r:235,g:235,b:235};
-    }
+
     function rgbToHsl(r,g,b){
       r/=255;g/=255;b/=255;
       const max=Math.max(r,g,b),min=Math.min(r,g,b);
@@ -208,20 +206,45 @@
       let r,g,b;
       if(s===0){r=g=b=l;}
       else{
-        const hue2rgb=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;};
         const q=l<0.5?l*(1+s):l+s-l*s,p=2*l-q;
+        const hue2rgb=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;};
         r=hue2rgb(p,q,h+1/3);g=hue2rgb(p,q,h);b=hue2rgb(p,q,h-1/3);
       }
       return{r:Math.round(r*255),g:Math.round(g*255),b:Math.round(b*255)};
     }
-    function forceDark(rgb){
-      // Gmail: invert brightness, preserve hue and saturation
+
+    // Partial invert: light backgrounds go dark, dark backgrounds stay. Hue preserved.
+    function partialInvert(rgb){
+      const hsl=rgbToHsl(rgb.r,rgb.g,rgb.b);
+      if(hsl.l<=0.4) return rgb; // dark already — leave it
+      const invertedL=1-hsl.l;
+      return hslToRgb(hsl.h,hsl.s,Math.max(0.1,invertedL));
+    }
+
+    // Full invert: everything flips, hue preserved, lightness clamped to ~25% min
+    // Calibrated against real Outlook result: #F6CEB4 (L=83%) -> #6F4819 (L~26%)
+    function fullInvert(rgb){
       const hsl=rgbToHsl(rgb.r,rgb.g,rgb.b);
       const invertedL=1-hsl.l;
-      // Clamp lightness so very light colors go genuinely dark and vice versa
-      const clampedL=hsl.l>0.5?Math.min(0.25,invertedL):Math.max(0.75,invertedL);
+      const clampedL=hsl.l>0.5
+        ? Math.max(0.25, invertedL)  // light colors: don't go darker than 25%
+        : Math.min(0.75, invertedL); // dark colors: don't go lighter than 75%
       return hslToRgb(hsl.h,hsl.s,clampedL);
     }
+
+    function smartDarkBg(rgb){
+      const l=lum(rgb.r,rgb.g,rgb.b);
+      if(l>0.7)return{r:18,g:18,b:18};
+      if(l<0.1)return{r:240,g:240,b:240};
+      return blend({r:255-rgb.r,g:255-rgb.g,b:255-rgb.b},{r:18,g:18,b:18},0.3);
+    }
+    function smartDarkFg(rgb,dBg){
+      const l=lum(rgb.r,rgb.g,rgb.b);
+      if(l<0.3)return{r:235,g:235,b:235};
+      const inv={r:255-rgb.r,g:255-rgb.g,b:255-rgb.b};
+      return cr(inv,dBg)>=4.5?inv:{r:235,g:235,b:235};
+    }
+
     function badgeClass(r){r=parseFloat(r);return r>=7?'badge pass-aaa':r>=4.5?'badge pass-aa':'badge fail';}
     function badgeLabel(r){r=parseFloat(r);return r>=7?'AAA':r>=4.5?'AA':'Fail';}
     function renderLevels(elId,ratio){
@@ -236,30 +259,19 @@
       for(const c of candidates){const ratio=cr(c,dBg);if(ratio>bestCr){bestCr=ratio;best=c;}}
       return{hex:toHex(best.r,best.g,best.b),ratio:bestCr.toFixed(2)};
     }
-    function buildRecs(bg,fg,dBg,dFg,dBgHex,fBg,fFg,dRatio,fRatio){
+    function buildRecs(bg,dBgHex,dRatio,fRatio){
       const recs=[];
       const dR=parseFloat(dRatio),fR=parseFloat(fRatio);
       const bgL=lum(bg.r,bg.g,bg.b);
-      if(dR<4.5){
-        const s=suggestDarkText(dBg);
-        recs.push({dot:'dot-warn',text:`Smart dark mode contrast is low (${dRatio}:1). Try <code>${s.hex}</code> for text on dark backgrounds — estimated contrast ${s.ratio}:1.`});
-      }
-      if(fR<4.5){
-        recs.push({dot:'dot-warn',text:`Force-dark contrast is ${fRatio}:1 — below AA. Email clients like Gmail may override colors unpredictably. Consider adding a <code>color-scheme: light</code> meta tag to opt out of force-dark.`});
-      }
-      if(bgL>0.5){
-        recs.push({dot:'dot-info',text:`Your background is light (<code>${dBgHex}</code> in dark mode). To control appearance, set an explicit dark background using <code>@media (prefers-color-scheme: dark)</code> in your email CSS.`});
-      }
-      if(bgL<0.1){
-        recs.push({dot:'dot-info',text:`Your background is very dark and may invert to near-white in some clients. Lock your intended dark colors with a media query to prevent unwanted inversion.`});
-      }
-      if(dR>=7&&fR>=7){
-        recs.push({dot:'dot-ok',text:`Both dark mode variants pass AAA — your palette holds up well across rendering environments.`});
-      } else if(dR>=4.5&&fR>=4.5){
-        recs.push({dot:'dot-ok',text:`Both dark mode variants pass AA. You're in good shape for most email clients.`});
-      }
+      if(dR<4.5) recs.push({dot:'dot-warn',text:`Partial invert contrast is low (${dRatio}:1) — affects Gmail Android and Outlook app users. Consider a darker foreground color.`});
+      if(fR<4.5) recs.push({dot:'dot-warn',text:`Full invert contrast is ${fRatio}:1 — below AA. Gmail iOS and Outlook Windows users may struggle to read this. Test in EoA before sending.`});
+      if(bgL>0.5) recs.push({dot:'dot-info',text:`Your background is light (simulated dark: <code>${dBgHex}</code>). Neither Gmail nor Outlook allow dark mode targeting via code, so design defensively with midtone colors.`});
+      if(bgL<0.1) recs.push({dot:'dot-info',text:`Your background is very dark and may invert to near-white in full invert clients like Gmail iOS. Test dark-themed emails carefully in EoA.`});
+      if(dR>=7&&fR>=7) recs.push({dot:'dot-ok',text:`Both invert modes pass AAA — your palette holds up well across rendering environments.`});
+      else if(dR>=4.5&&fR>=4.5) recs.push({dot:'dot-ok',text:`Both invert modes pass AA. You're in good shape for most email clients.`});
       return recs;
     }
+
     function update(){
       const bgHex=document.getElementById('bgHex').value;
       const fgHex=document.getElementById('fgHex').value;
@@ -268,27 +280,27 @@
       if(/^#[0-9a-fA-F]{6}$/.test(bgHex))document.getElementById('bgPicker').value=bgHex;
       if(/^#[0-9a-fA-F]{6}$/.test(fgHex))document.getElementById('fgPicker').value=fgHex;
 
-      const lc=document.getElementById('lightCard');
-      lc.style.background=bgHex;
+      // Light
+      document.getElementById('lightCard').style.background=bgHex;
       ['lightH','lightB'].forEach(id=>document.getElementById(id).style.color=fgHex);
-      const lCTA=document.getElementById('lightCTA');
-      lCTA.style.background=fgHex;lCTA.style.color=bgHex;
+      document.getElementById('lightCTA').style.background=fgHex;
+      document.getElementById('lightCTA').style.color=bgHex;
 
-      const dBg=smartDarkBg(bg),dFg=smartDarkFg(fg,dBg);
-      const dBgHex=toHex(dBg.r,dBg.g,dBg.b),dFgHex=toHex(dFg.r,dFg.g,dFg.b);
-      const dc=document.getElementById('darkCard');
-      dc.style.background=dBgHex;
+      // Partial invert
+      const dBg=partialInvert(bg), dFg=partialInvert(fg);
+      const dBgHex=toHex(dBg.r,dBg.g,dBg.b), dFgHex=toHex(dFg.r,dFg.g,dFg.b);
+      document.getElementById('darkCard').style.background=dBgHex;
       ['darkH','darkB'].forEach(id=>document.getElementById(id).style.color=dFgHex);
-      const dCTA=document.getElementById('darkCTA');
-      dCTA.style.background=dFgHex;dCTA.style.color=dBgHex;
+      document.getElementById('darkCTA').style.background=dFgHex;
+      document.getElementById('darkCTA').style.color=dBgHex;
 
-      const fBg=forceDark(bg),fFg=forceDark(fg);
-      const fBgHex=toHex(fBg.r,fBg.g,fBg.b),fFgHex=toHex(fFg.r,fFg.g,fFg.b);
-      const fc=document.getElementById('forceCard');
-      fc.style.background=fBgHex;
+      // Full invert
+      const fBg=fullInvert(bg), fFg=fullInvert(fg);
+      const fBgHex=toHex(fBg.r,fBg.g,fBg.b), fFgHex=toHex(fFg.r,fFg.g,fFg.b);
+      document.getElementById('forceCard').style.background=fBgHex;
       ['forceH','forceB'].forEach(id=>document.getElementById(id).style.color=fFgHex);
-      const fCTA=document.getElementById('forceCTA');
-      fCTA.style.background=fFgHex;fCTA.style.color=fBgHex;
+      document.getElementById('forceCTA').style.background=fFgHex;
+      document.getElementById('forceCTA').style.color=fBgHex;
 
       const lRatio=cr(bg,fg).toFixed(2);
       const dRatio=cr(dBg,dFg).toFixed(2);
@@ -305,12 +317,12 @@
         renderLevels(m+'Levels',ratio);
       });
 
-      const recs=buildRecs(bg,fg,dBg,dFg,dBgHex,fBg,fFg,dRatio,fRatio);
-      const list=document.getElementById('recsList');
-      list.innerHTML=recs.length===0
+      const recs=buildRecs(bg,dBgHex,dRatio,fRatio);
+      document.getElementById('recsList').innerHTML=recs.length===0
         ?'<div class="no-recs">No issues found — your colors look good across all modes.</div>'
         :recs.map(r=>`<div class="rec-item"><div class="rec-dot ${r.dot}"></div><div class="rec-text">${r.text}</div></div>`).join('');
     }
+
     function swapColors(){
       const bg=document.getElementById('bgHex').value,fg=document.getElementById('fgHex').value;
       document.getElementById('bgHex').value=fg;document.getElementById('fgHex').value=bg;
