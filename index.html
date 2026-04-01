@@ -6,174 +6,297 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dark Mode Color Checker</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f5f5f5;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #ffffff;
+      --surface: #f5f4f2;
+      --border: rgba(0,0,0,0.12);
+      --border-mid: rgba(0,0,0,0.2);
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --pass-aaa-bg: #eaf3de; --pass-aaa-text: #27500a;
+      --pass-aa-bg: #e6f1fb; --pass-aa-text: #0c447c;
+      --fail-bg: #fcebeb; --fail-text: #a32d2d;
+      --warn-dot: #ba7517;
+      --ok-dot: #3b6d11;
+      --info-dot: #185fa5;
+      --mono: 'Courier New', monospace;
     }
-
-    h1 {
-      margin-bottom: 10px;
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1e;
+        --surface: #2c2c2e;
+        --border: rgba(255,255,255,0.1);
+        --border-mid: rgba(255,255,255,0.2);
+        --text: #f0f0f0;
+        --text-muted: #a0a0a0;
+        --pass-aaa-bg: #173404; --pass-aaa-text: #c0dd97;
+        --pass-aa-bg: #042c53; --pass-aa-text: #85b7eb;
+        --fail-bg: #501313; --fail-text: #f09595;
+        --warn-dot: #ef9f27;
+        --ok-dot: #97c459;
+        --info-dot: #378add;
+      }
     }
-
-    .controls {
-      margin-bottom: 20px;
-    }
-
-    input {
-      padding: 8px;
-      margin-right: 10px;
-      width: 150px;
-    }
-
-    .preview-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .preview {
-      padding: 20px;
-      border-radius: 10px;
-    }
-
-    .card {
-      padding: 20px;
-      border-radius: 8px;
-    }
-
-    .button {
-      display: inline-block;
-      padding: 10px 15px;
-      margin-top: 10px;
-      border-radius: 5px;
-      text-decoration: none;
-    }
-
-    .result {
-      margin-top: 15px;
-      font-weight: bold;
-    }
+    body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); padding: 28px 24px; min-height: 100vh; }
+    h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+    .controls { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 24px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 12px; color: var(--text-muted); }
+    .swatch-row { display: flex; gap: 6px; align-items: center; }
+    input[type="color"] { width: 36px; height: 36px; padding: 2px; border-radius: var(--radius-md); border: 0.5px solid var(--border); cursor: pointer; background: none; }
+    input[type="text"] { height: 36px; padding: 0 10px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--mono); font-size: 13px; width: 96px; outline: none; }
+    input[type="text"]:focus { border-color: var(--border-mid); }
+    button { height: 36px; padding: 0 14px; border-radius: var(--radius-md); border: 0.5px solid var(--border-mid); background: transparent; color: var(--text); font-size: 13px; cursor: pointer; }
+    button:hover { background: var(--surface); }
+    .previews { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .panel { border-radius: var(--radius-lg); border: 0.5px solid var(--border); overflow: hidden; }
+    .panel-label { font-size: 11px; padding: 8px 14px; background: var(--surface); color: var(--text-muted); border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .badge { font-size: 11px; padding: 2px 8px; border-radius: var(--radius-md); font-weight: 600; }
+    .pass-aaa { background: var(--pass-aaa-bg); color: var(--pass-aaa-text); }
+    .pass-aa  { background: var(--pass-aa-bg);  color: var(--pass-aa-text);  }
+    .fail     { background: var(--fail-bg);      color: var(--fail-text);     }
+    .email-card { padding: 20px 18px; }
+    .email-card .headline { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+    .email-card .body-text { font-size: 13px; line-height: 1.6; margin-bottom: 14px; }
+    .email-card .cta { display: inline-block; padding: 9px 20px; border-radius: 999px; font-size: 13px; font-weight: 600; text-decoration: none; cursor: default; }
+    .ratio-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+    .ratio-card { flex: 1; min-width: 140px; background: var(--surface); border-radius: var(--radius-md); padding: 12px 14px; }
+    .rc-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+    .rc-val { font-size: 22px; font-weight: 600; }
+    .rc-levels { margin-top: 6px; display: flex; gap: 5px; flex-wrap: wrap; }
+    .level { padding: 2px 7px; border-radius: var(--radius-md); font-size: 11px; font-weight: 600; }
+    .recs { border-radius: var(--radius-lg); border: 0.5px solid var(--border); overflow: hidden; }
+    .recs-header { font-size: 12px; font-weight: 600; padding: 10px 14px; background: var(--surface); color: var(--text-muted); border-bottom: 0.5px solid var(--border); }
+    .rec-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-bottom: 0.5px solid var(--border); }
+    .rec-item:last-child { border-bottom: none; }
+    .rec-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+    .dot-warn { background: var(--warn-dot); }
+    .dot-ok   { background: var(--ok-dot); }
+    .dot-info { background: var(--info-dot); }
+    .rec-text { font-size: 13px; line-height: 1.6; }
+    .rec-text code { font-family: var(--mono); font-size: 12px; background: var(--surface); padding: 1px 5px; border-radius: 4px; }
+    .no-recs { padding: 14px; font-size: 13px; color: var(--text-muted); }
   </style>
 </head>
 <body>
   <h1>Dark Mode Color Checker</h1>
+  <p class="subtitle">Preview your email palette across light, smart dark, and force-dark rendering environments.</p>
 
   <div class="controls">
-    <label>Background Color:</label>
-    <input type="text" id="bg" value="#ffffff" />
-
-    <label>Text Color:</label>
-    <input type="text" id="text" value="#000000" />
-
-    <button onclick="updatePreview()">Check</button>
-  </div>
-
-  <div class="preview-container">
-    <div>
-      <h3>Light Mode</h3>
-      <div id="lightPreview" class="preview">
-        <div class="card" id="lightCard">
-          <h2>Sample Headline</h2>
-          <p>This is body text preview.</p>
-          <a href="#" class="button">Shop Now</a>
-        </div>
+    <div class="field">
+      <label>Background</label>
+      <div class="swatch-row">
+        <input type="color" id="bgPicker" value="#ffffff">
+        <input type="text" id="bgHex" value="#ffffff">
       </div>
     </div>
+    <div class="field">
+      <label>Text / foreground</label>
+      <div class="swatch-row">
+        <input type="color" id="fgPicker" value="#1a1a1a">
+        <input type="text" id="fgHex" value="#1a1a1a">
+      </div>
+    </div>
+    <button onclick="swapColors()">&#8644; Swap</button>
+  </div>
 
-    <div>
-      <h3>Dark Mode (Simulated)</h3>
-      <div id="darkPreview" class="preview">
-        <div class="card" id="darkCard">
-          <h2>Sample Headline</h2>
-          <p>This is body text preview.</p>
-          <a href="#" class="button">Shop Now</a>
-        </div>
+  <div class="previews">
+    <div class="panel">
+      <div class="panel-label"><span>Light mode</span><span id="lightBadge" class="badge">—</span></div>
+      <div class="email-card" id="lightCard">
+        <div class="headline" id="lightH">Summer Sale — Up to 50% off</div>
+        <div class="body-text" id="lightB">Refresh your wardrobe with our biggest sale of the season.</div>
+        <a class="cta" id="lightCTA">Shop now</a>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-label"><span>Dark mode (smart invert)</span><span id="darkBadge" class="badge">—</span></div>
+      <div class="email-card" id="darkCard">
+        <div class="headline" id="darkH">Summer Sale — Up to 50% off</div>
+        <div class="body-text" id="darkB">Refresh your wardrobe with our biggest sale of the season.</div>
+        <a class="cta" id="darkCTA">Shop now</a>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-label"><span>Force-dark (Gmail / Apple Mail)</span><span id="forceBadge" class="badge">—</span></div>
+      <div class="email-card" id="forceCard">
+        <div class="headline" id="forceH">Summer Sale — Up to 50% off</div>
+        <div class="body-text" id="forceB">Refresh your wardrobe with our biggest sale of the season.</div>
+        <a class="cta" id="forceCTA">Shop now</a>
       </div>
     </div>
   </div>
 
-  <div class="result" id="contrastResult"></div>
+  <div class="ratio-row">
+    <div class="ratio-card">
+      <div class="rc-label">Light mode contrast</div>
+      <div class="rc-val" id="lightRatio">—</div>
+      <div class="rc-levels" id="lightLevels"></div>
+    </div>
+    <div class="ratio-card">
+      <div class="rc-label">Dark mode contrast</div>
+      <div class="rc-val" id="darkRatio">—</div>
+      <div class="rc-levels" id="darkLevels"></div>
+    </div>
+    <div class="ratio-card">
+      <div class="rc-label">Force-dark contrast</div>
+      <div class="rc-val" id="forceRatio">—</div>
+      <div class="rc-levels" id="forceLevels"></div>
+    </div>
+  </div>
+
+  <div class="recs">
+    <div class="recs-header">Dark mode recommendations</div>
+    <div id="recsList"></div>
+  </div>
 
   <script>
     function hexToRgb(hex) {
-      hex = hex.replace('#', '');
-      if (hex.length === 3) {
-        hex = hex.split('').map(c => c + c).join('');
-      }
-      const bigint = parseInt(hex, 16);
-      return {
-        r: (bigint >> 16) & 255,
-        g: (bigint >> 8) & 255,
-        b: bigint & 255
-      };
+      hex = hex.replace('#','').trim();
+      if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
+      if (hex.length !== 6) return null;
+      const n = parseInt(hex,16);
+      return {r:(n>>16)&255,g:(n>>8)&255,b:n&255};
     }
+    function lum(r,g,b) {
+      return [r,g,b].reduce((acc,v,i)=>{
+        v/=255; v=v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);
+        return acc+v*[0.2126,0.7152,0.0722][i];
+      },0);
+    }
+    function cr(c1,c2) {
+      const l1=lum(c1.r,c1.g,c1.b),l2=lum(c2.r,c2.g,c2.b);
+      return (Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05);
+    }
+    function toHex(r,g,b) {
+      return '#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+    }
+    function blend(c,t,x){return{r:c.r+(t.r-c.r)*x,g:c.g+(t.g-c.g)*x,b:c.b+(t.b-c.b)*x};}
+    function smartDarkBg(rgb){
+      const l=lum(rgb.r,rgb.g,rgb.b);
+      if(l>0.7)return{r:18,g:18,b:18};
+      if(l<0.1)return{r:240,g:240,b:240};
+      return blend({r:255-rgb.r,g:255-rgb.g,b:255-rgb.b},{r:18,g:18,b:18},0.3);
+    }
+    function smartDarkFg(rgb,dBg){
+      const l=lum(rgb.r,rgb.g,rgb.b);
+      if(l<0.3)return{r:235,g:235,b:235};
+      const inv={r:255-rgb.r,g:255-rgb.g,b:255-rgb.b};
+      return cr(inv,dBg)>=4.5?inv:{r:235,g:235,b:235};
+    }
+    function forceDark(rgb){
+      const l=lum(rgb.r,rgb.g,rgb.b);
+      const inv={r:255-rgb.r,g:255-rgb.g,b:255-rgb.b};
+      return l>0.5?blend(inv,{r:20,g:20,b:20},0.15):blend(inv,{r:230,g:230,b:230},0.1);
+    }
+    function badgeClass(r){r=parseFloat(r);return r>=7?'badge pass-aaa':r>=4.5?'badge pass-aa':'badge fail';}
+    function badgeLabel(r){r=parseFloat(r);return r>=7?'AAA':r>=4.5?'AA':'Fail';}
+    function renderLevels(elId,ratio){
+      const r=parseFloat(ratio);
+      document.getElementById(elId).innerHTML=[
+        {label:'AA normal',pass:r>=4.5},{label:'AA large',pass:r>=3},{label:'AAA',pass:r>=7}
+      ].map(l=>`<span class="level ${l.pass?'pass-aa':'fail'}">${l.label}</span>`).join('');
+    }
+    function suggestDarkText(dBg){
+      const candidates=[{r:235,g:235,b:235},{r:255,g:255,b:255},{r:200,g:200,b:200}];
+      let best=candidates[0],bestCr=0;
+      for(const c of candidates){const ratio=cr(c,dBg);if(ratio>bestCr){bestCr=ratio;best=c;}}
+      return{hex:toHex(best.r,best.g,best.b),ratio:bestCr.toFixed(2)};
+    }
+    function buildRecs(bg,fg,dBg,dFg,dBgHex,fBg,fFg,dRatio,fRatio){
+      const recs=[];
+      const dR=parseFloat(dRatio),fR=parseFloat(fRatio);
+      const bgL=lum(bg.r,bg.g,bg.b);
+      if(dR<4.5){
+        const s=suggestDarkText(dBg);
+        recs.push({dot:'dot-warn',text:`Smart dark mode contrast is low (${dRatio}:1). Try <code>${s.hex}</code> for text on dark backgrounds — estimated contrast ${s.ratio}:1.`});
+      }
+      if(fR<4.5){
+        recs.push({dot:'dot-warn',text:`Force-dark contrast is ${fRatio}:1 — below AA. Email clients like Gmail may override colors unpredictably. Consider adding a <code>color-scheme: light</code> meta tag to opt out of force-dark.`});
+      }
+      if(bgL>0.5){
+        recs.push({dot:'dot-info',text:`Your background is light (<code>${dBgHex}</code> in dark mode). To control appearance, set an explicit dark background using <code>@media (prefers-color-scheme: dark)</code> in your email CSS.`});
+      }
+      if(bgL<0.1){
+        recs.push({dot:'dot-info',text:`Your background is very dark and may invert to near-white in some clients. Lock your intended dark colors with a media query to prevent unwanted inversion.`});
+      }
+      if(dR>=7&&fR>=7){
+        recs.push({dot:'dot-ok',text:`Both dark mode variants pass AAA — your palette holds up well across rendering environments.`});
+      } else if(dR>=4.5&&fR>=4.5){
+        recs.push({dot:'dot-ok',text:`Both dark mode variants pass AA. You're in good shape for most email clients.`});
+      }
+      return recs;
+    }
+    function update(){
+      const bgHex=document.getElementById('bgHex').value;
+      const fgHex=document.getElementById('fgHex').value;
+      const bg=hexToRgb(bgHex),fg=hexToRgb(fgHex);
+      if(!bg||!fg)return;
+      if(/^#[0-9a-fA-F]{6}$/.test(bgHex))document.getElementById('bgPicker').value=bgHex;
+      if(/^#[0-9a-fA-F]{6}$/.test(fgHex))document.getElementById('fgPicker').value=fgHex;
 
-    function luminance(r, g, b) {
-      const a = [r, g, b].map(v => {
-        v /= 255;
-        return v <= 0.03928
-          ? v / 12.92
-          : Math.pow((v + 0.055) / 1.055, 2.4);
+      const lc=document.getElementById('lightCard');
+      lc.style.background=bgHex;
+      ['lightH','lightB'].forEach(id=>document.getElementById(id).style.color=fgHex);
+      const lCTA=document.getElementById('lightCTA');
+      lCTA.style.background=fgHex;lCTA.style.color=bgHex;
+
+      const dBg=smartDarkBg(bg),dFg=smartDarkFg(fg,dBg);
+      const dBgHex=toHex(dBg.r,dBg.g,dBg.b),dFgHex=toHex(dFg.r,dFg.g,dFg.b);
+      const dc=document.getElementById('darkCard');
+      dc.style.background=dBgHex;
+      ['darkH','darkB'].forEach(id=>document.getElementById(id).style.color=dFgHex);
+      const dCTA=document.getElementById('darkCTA');
+      dCTA.style.background=dFgHex;dCTA.style.color=dBgHex;
+
+      const fBg=forceDark(bg),fFg=forceDark(fg);
+      const fBgHex=toHex(fBg.r,fBg.g,fBg.b),fFgHex=toHex(fFg.r,fFg.g,fFg.b);
+      const fc=document.getElementById('forceCard');
+      fc.style.background=fBgHex;
+      ['forceH','forceB'].forEach(id=>document.getElementById(id).style.color=fFgHex);
+      const fCTA=document.getElementById('forceCTA');
+      fCTA.style.background=fFgHex;fCTA.style.color=fBgHex;
+
+      const lRatio=cr(bg,fg).toFixed(2);
+      const dRatio=cr(dBg,dFg).toFixed(2);
+      const fRatio=cr(fBg,fFg).toFixed(2);
+
+      document.getElementById('lightRatio').textContent=lRatio+':1';
+      document.getElementById('darkRatio').textContent=dRatio+':1';
+      document.getElementById('forceRatio').textContent=fRatio+':1';
+
+      ['light','dark','force'].forEach((m,i)=>{
+        const ratio=[lRatio,dRatio,fRatio][i];
+        const b=document.getElementById(m+'Badge');
+        b.className=badgeClass(ratio);b.textContent=badgeLabel(ratio);
+        renderLevels(m+'Levels',ratio);
       });
-      return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+
+      const recs=buildRecs(bg,fg,dBg,dFg,dBgHex,fBg,fFg,dRatio,fRatio);
+      const list=document.getElementById('recsList');
+      list.innerHTML=recs.length===0
+        ?'<div class="no-recs">No issues found — your colors look good across all modes.</div>'
+        :recs.map(r=>`<div class="rec-item"><div class="rec-dot ${r.dot}"></div><div class="rec-text">${r.text}</div></div>`).join('');
     }
-
-    function contrast(hex1, hex2) {
-      const c1 = hexToRgb(hex1);
-      const c2 = hexToRgb(hex2);
-      const l1 = luminance(c1.r, c1.g, c1.b);
-      const l2 = luminance(c2.r, c2.g, c2.b);
-      const brightest = Math.max(l1, l2);
-      const darkest = Math.min(l1, l2);
-      return (brightest + 0.05) / (darkest + 0.05);
+    function swapColors(){
+      const bg=document.getElementById('bgHex').value,fg=document.getElementById('fgHex').value;
+      document.getElementById('bgHex').value=fg;document.getElementById('fgHex').value=bg;
+      if(/^#[0-9a-fA-F]{6}$/.test(fg))document.getElementById('bgPicker').value=fg;
+      if(/^#[0-9a-fA-F]{6}$/.test(bg))document.getElementById('fgPicker').value=bg;
+      update();
     }
-
-    function invertColor(hex) {
-      const rgb = hexToRgb(hex);
-      const r = 255 - rgb.r;
-      const g = 255 - rgb.g;
-      const b = 255 - rgb.b;
-      return `rgb(${r}, ${g}, ${b})`;
-    }
-
-    function updatePreview() {
-      const bg = document.getElementById('bg').value;
-      const text = document.getElementById('text').value;
-
-      // Light mode
-      const lightCard = document.getElementById('lightCard');
-      lightCard.style.background = bg;
-      lightCard.style.color = text;
-      lightCard.querySelector('.button').style.background = text;
-      lightCard.querySelector('.button').style.color = bg;
-
-      // Dark mode simulation (invert)
-      const darkCard = document.getElementById('darkCard');
-      const darkBg = invertColor(bg);
-      const darkText = invertColor(text);
-
-      darkCard.style.background = darkBg;
-      darkCard.style.color = darkText;
-      darkCard.querySelector('.button').style.background = darkText;
-      darkCard.querySelector('.button').style.color = darkBg;
-
-      // Contrast
-      const ratio = contrast(bg, text).toFixed(2);
-      let resultText = `Contrast Ratio: ${ratio} `;
-
-      if (ratio >= 7) {
-        resultText += '(AAA ✅)';
-      } else if (ratio >= 4.5) {
-        resultText += '(AA ✅)';
-      } else {
-        resultText += '(Fail ❌)';
-      }
-
-      document.getElementById('contrastResult').innerText = resultText;
-    }
-
-    updatePreview();
+    ['bgPicker','fgPicker'].forEach(id=>{
+      document.getElementById(id).addEventListener('input',e=>{
+        document.getElementById(id==='bgPicker'?'bgHex':'fgHex').value=e.target.value;
+        update();
+      });
+    });
+    ['bgHex','fgHex'].forEach(id=>document.getElementById(id).addEventListener('input',update));
+    update();
   </script>
 </body>
 </html>
